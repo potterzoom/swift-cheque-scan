@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +11,37 @@ import ChequeForm from "@/components/ChequeForm";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("scanner");
   const [scannedImage, setScannedImage] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    totalCheques: 0,
+    clientesUnicos: 0,
+    proveedoresUnicos: 0,
+    procesadosHoy: 0
+  });
+
+  useEffect(() => {
+    // Calcular estadísticas desde localStorage
+    const savedCheques = JSON.parse(localStorage.getItem('cheques') || '[]');
+    
+    const hoy = new Date().toDateString();
+    const procesadosHoy = savedCheques.filter((cheque: any) => 
+      new Date(cheque.fechaProcesamiento).toDateString() === hoy
+    ).length;
+
+    const clientesUnicos = new Set(
+      savedCheques.filter((c: any) => c.tipo === 'cliente').map((c: any) => c.emisor)
+    ).size;
+
+    const proveedoresUnicos = new Set(
+      savedCheques.filter((c: any) => c.tipo === 'proveedor').map((c: any) => c.emisor)
+    ).size;
+
+    setStats({
+      totalCheques: savedCheques.length,
+      clientesUnicos,
+      proveedoresUnicos,
+      procesadosHoy
+    });
+  }, [activeTab]); // Recalcular cuando cambie de pestaña
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -105,7 +136,7 @@ const Index = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Ahora con datos dinámicos */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
           <Card>
             <CardContent className="p-4">
@@ -113,7 +144,7 @@ const Index = () => {
                 <FileText className="w-8 h-8 text-blue-600" />
                 <div>
                   <p className="text-sm text-gray-600">Total Cheques</p>
-                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-2xl font-bold">{stats.totalCheques}</p>
                 </div>
               </div>
             </CardContent>
@@ -124,7 +155,7 @@ const Index = () => {
                 <Users className="w-8 h-8 text-green-600" />
                 <div>
                   <p className="text-sm text-gray-600">Clientes</p>
-                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-2xl font-bold">{stats.clientesUnicos}</p>
                 </div>
               </div>
             </CardContent>
@@ -135,7 +166,7 @@ const Index = () => {
                 <BarChart3 className="w-8 h-8 text-purple-600" />
                 <div>
                   <p className="text-sm text-gray-600">Proveedores</p>
-                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-2xl font-bold">{stats.proveedoresUnicos}</p>
                 </div>
               </div>
             </CardContent>
@@ -146,7 +177,7 @@ const Index = () => {
                 <Camera className="w-8 h-8 text-orange-600" />
                 <div>
                   <p className="text-sm text-gray-600">Hoy</p>
-                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-2xl font-bold">{stats.procesadosHoy}</p>
                 </div>
               </div>
             </CardContent>
