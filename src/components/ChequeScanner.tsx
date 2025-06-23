@@ -2,16 +2,18 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Camera, Upload, RefreshCw } from "lucide-react";
+import { Camera, Upload, RefreshCw, Scan, QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { extractChequeData, ChequeOCRData } from "@/utils/ocrService";
 
 interface ChequeScannerProps {
-  onImageCaptured: (image: string) => void;
+  onImageCaptured: (image: string, ocrData?: ChequeOCRData) => void;
 }
 
 const ChequeScanner = ({ onImageCaptured }: ChequeScannerProps) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStep, setProcessingStep] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -32,20 +34,52 @@ const ChequeScanner = ({ onImageCaptured }: ChequeScannerProps) => {
     
     setIsProcessing(true);
     
-    // Simular procesamiento OCR
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    toast({
-      title: "Procesamiento completado",
-      description: "La información del cheque ha sido extraída exitosamente",
-    });
-    
-    setIsProcessing(false);
-    onImageCaptured(capturedImage);
+    try {
+      // Simular diferentes etapas del procesamiento OCR
+      setProcessingStep("Analizando imagen del cheque...");
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setProcessingStep("Extracting datos del frente del cheque...");
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      setProcessingStep("Decodificando código de barras...");
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      setProcessingStep("Leyendo línea MICR transparente...");
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setProcessingStep("Procesando datos del reverso...");
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      setProcessingStep("Validando información extraída...");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Extraer todos los datos del cheque
+      const ocrData = await extractChequeData(capturedImage);
+      
+      toast({
+        title: "Procesamiento OCR completado",
+        description: "Se han extraído exitosamente los datos del cheque, código de barras, línea MICR y reverso",
+      });
+      
+      setIsProcessing(false);
+      setProcessingStep("");
+      onImageCaptured(capturedImage, ocrData);
+      
+    } catch (error) {
+      toast({
+        title: "Error en el procesamiento",
+        description: "No se pudieron extraer todos los datos del cheque",
+        variant: "destructive"
+      });
+      setIsProcessing(false);
+      setProcessingStep("");
+    }
   };
 
   const retakePhoto = () => {
     setCapturedImage(null);
+    setProcessingStep("");
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -59,9 +93,26 @@ const ChequeScanner = ({ onImageCaptured }: ChequeScannerProps) => {
           <h3 className="text-lg font-semibold text-gray-700 mb-2">
             Capturar imagen del cheque
           </h3>
-          <p className="text-gray-500 mb-4">
-            Selecciona una imagen desde tu dispositivo o toma una foto
+          <p className="text-gray-500 mb-6">
+            Toma una foto clara del cheque (frente y reverso si es posible)
           </p>
+          
+          <div className="bg-blue-50 p-4 rounded-lg mb-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <QrCode className="w-5 h-5 text-blue-600" />
+              <span className="font-medium text-blue-800">OCR Avanzado Activado</span>
+            </div>
+            <p className="text-sm text-blue-700">
+              Este sistema extraerá automáticamente:
+            </p>
+            <ul className="text-sm text-blue-600 mt-2 space-y-1">
+              <li>• Datos básicos del cheque (número, monto, fecha, banco)</li>
+              <li>• Información del código de barras</li>
+              <li>• Datos de la línea MICR (caracteres magnéticos)</li>
+              <li>• Información del reverso (códigos de depósito)</li>
+            </ul>
+          </div>
+          
           <input
             ref={fileInputRef}
             type="file"
@@ -75,7 +126,7 @@ const ChequeScanner = ({ onImageCaptured }: ChequeScannerProps) => {
             className="flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />
-            Seleccionar Imagen
+            Seleccionar Imagen del Cheque
           </Button>
         </div>
       ) : (
@@ -87,6 +138,19 @@ const ChequeScanner = ({ onImageCaptured }: ChequeScannerProps) => {
                 alt="Cheque capturado"
                 className="w-full max-w-md mx-auto rounded-lg shadow-md"
               />
+              
+              {isProcessing && (
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-3 mb-2">
+                    <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
+                    <span className="font-medium text-blue-800">Procesando OCR Avanzado...</span>
+                  </div>
+                  <p className="text-sm text-blue-700">{processingStep}</p>
+                  <div className="w-full bg-blue-200 rounded-full h-2 mt-3">
+                    <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{width: '75%'}}></div>
+                  </div>
+                </div>
+              )}
               
               <div className="flex gap-2 justify-center">
                 <Button
@@ -105,13 +169,13 @@ const ChequeScanner = ({ onImageCaptured }: ChequeScannerProps) => {
                 >
                   {isProcessing ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Procesando...
+                      <Scan className="w-4 h-4 animate-pulse" />
+                      Procesando OCR...
                     </>
                   ) : (
                     <>
-                      <Camera className="w-4 h-4" />
-                      Procesar Cheque
+                      <Scan className="w-4 h-4" />
+                      Procesar con OCR Avanzado
                     </>
                   )}
                 </Button>

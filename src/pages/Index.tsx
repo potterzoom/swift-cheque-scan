@@ -6,11 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Camera, FileText, BarChart3, Users } from "lucide-react";
 import ChequeScanner from "@/components/ChequeScanner";
 import ChequeDashboard from "@/components/ChequeDashboard";
-import ChequeForm from "@/components/ChequeForm";
+import EnhancedChequeForm from "@/components/EnhancedChequeForm";
+import { ChequeOCRData } from "@/utils/ocrService";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("scanner");
   const [scannedImage, setScannedImage] = useState<string | null>(null);
+  const [ocrData, setOcrData] = useState<ChequeOCRData | null>(null);
   const [stats, setStats] = useState({
     totalCheques: 0,
     clientesUnicos: 0,
@@ -51,8 +53,11 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Swift Cheque Scan
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-gray-600 mb-2">
             Sistema inteligente de procesamiento de cheques
+          </p>
+          <p className="text-sm text-blue-600 font-medium">
+            ✨ Con OCR Avanzado: Código de Barras + Línea MICR + Datos del Reverso
           </p>
         </div>
 
@@ -79,16 +84,17 @@ const Index = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Camera className="w-5 h-5" />
-                  Escanear Cheque
+                  Escanear Cheque con OCR Avanzado
                 </CardTitle>
                 <CardDescription>
-                  Toma una foto del cheque para extraer automáticamente la información
+                  Toma una foto del cheque para extraer automáticamente toda la información incluyendo código de barras, línea MICR y datos del reverso
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ChequeScanner 
-                  onImageCaptured={(image) => {
+                  onImageCaptured={(image, extractedData) => {
                     setScannedImage(image);
+                    setOcrData(extractedData || null);
                     setActiveTab("form");
                   }}
                 />
@@ -102,14 +108,15 @@ const Index = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="w-5 h-5" />
-                  Datos del Cheque
+                  Datos Completos del Cheque
                 </CardTitle>
                 <CardDescription>
-                  Revisa y completa la información extraída del cheque
+                  Revisa y completa toda la información extraída del cheque mediante OCR avanzado
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ChequeForm 
+                <EnhancedChequeForm 
+                  ocrData={ocrData}
                   scannedImage={scannedImage}
                   onSave={() => setActiveTab("dashboard")}
                 />
@@ -126,7 +133,7 @@ const Index = () => {
                   Dashboard de Cheques
                 </CardTitle>
                 <CardDescription>
-                  Historial y gestión de todos los cheques procesados
+                  Historial y gestión de todos los cheques procesados con OCR avanzado
                 </CardDescription>
               </CardHeader>
               <CardContent>
