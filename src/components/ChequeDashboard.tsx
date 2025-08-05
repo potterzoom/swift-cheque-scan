@@ -6,9 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, FileText, DollarSign, Calendar, Building, BarChart3, Bell } from "lucide-react";
+import { Search, FileText, DollarSign, Calendar, Building, BarChart3, Bell, Camera, Plus } from "lucide-react";
 import DashboardStats from "./DashboardStats";
 import DashboardAlerts from "./DashboardAlerts";
+import CameraModal from "./CameraModal";
+import { useToast } from "@/hooks/use-toast";
 
 interface Cheque {
   id: string;
@@ -30,6 +32,8 @@ const ChequeDashboard = () => {
   const [filterType, setFilterType] = useState("todos");
   const [filterStatus, setFilterStatus] = useState("todos");
   const [activeView, setActiveView] = useState("resumen");
+  const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const savedCheques = JSON.parse(localStorage.getItem('cheques') || '[]');
@@ -78,8 +82,45 @@ const ChequeDashboard = () => {
     }
   };
 
+  const handleCameraCapture = (image: string, ocrData?: any) => {
+    if (ocrData) {
+      const newCheque: Cheque = {
+        id: Date.now().toString(),
+        numero: ocrData.numero || `CHQ-${Date.now()}`,
+        monto: ocrData.monto?.toString() || "0",
+        banco: ocrData.banco || "Banco detectado",
+        fecha: ocrData.fechaEmision || new Date().toISOString().split('T')[0],
+        emisor: ocrData.emisor || "Emisor detectado",
+        tipo: "cliente",
+        estado: "pendiente",
+        fechaProcesamiento: new Date().toISOString(),
+        imagen: image
+      };
+
+      const updatedCheques = [...cheques, newCheque];
+      setCheques(updatedCheques);
+      localStorage.setItem('cheques', JSON.stringify(updatedCheques));
+      
+      toast({
+        title: "Cheque Escaneado",
+        description: `Cheque #${newCheque.numero} agregado exitosamente`,
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Botón de escaneo rápido */}
+      <div className="flex justify-end">
+        <Button
+          onClick={() => setIsCameraModalOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <Camera className="w-4 h-4" />
+          Escanear Cheque
+        </Button>
+      </div>
+
       {/* Vista con pestañas */}
       <Tabs value={activeView} onValueChange={setActiveView}>
         <TabsList className="grid w-full grid-cols-3">
@@ -157,9 +198,16 @@ const ChequeDashboard = () => {
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">
                       No hay cheques procesados
                     </h3>
-                    <p className="text-gray-500">
-                      Comienza escaneando tu primer cheque en la pestaña "Escanear"
+                    <p className="text-gray-500 mb-4">
+                      Comienza escaneando tu primer cheque
                     </p>
+                    <Button
+                      onClick={() => setIsCameraModalOpen(true)}
+                      className="flex items-center gap-2 mx-auto"
+                    >
+                      <Camera className="w-4 h-4" />
+                      Escanear Primer Cheque
+                    </Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -218,6 +266,13 @@ const ChequeDashboard = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Modal de Cámara */}
+      <CameraModal
+        isOpen={isCameraModalOpen}
+        onClose={() => setIsCameraModalOpen(false)}
+        onCapture={handleCameraCapture}
+      />
     </div>
   );
 };
