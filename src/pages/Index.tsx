@@ -8,6 +8,7 @@ import ChequeDashboard from "@/components/ChequeDashboard";
 import EcuadorianChequeForm from "@/components/EcuadorianChequeForm";
 import AppHeader from "@/components/layout/AppHeader";
 import StatsGrid from "@/components/layout/StatsGrid";
+import Footer from "@/components/layout/Footer";
 import { useScanStore } from "@/features/scan/store/useScanStore";
 import { useChequesStore } from "@/features/cheques/store/useChequesStore";
 import { EcuadorianChequeOCRData as LegacyOCRData } from "@/utils/ecuadorianOCRService";
@@ -130,6 +131,9 @@ const Index = () => {
 
         {/* Stats Grid */}
         <StatsGrid stats={stats} />
+        
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
