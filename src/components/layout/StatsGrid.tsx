@@ -77,65 +77,55 @@ const StatsGrid = ({ stats }: StatsGridProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-8">
       {statsItems.map((item, index) => {
         const IconComponent = item.icon;
         return (
-          <Card key={index} className="card-natural hover:glow-effect transition-all duration-300 border-l-4 border-l-primary/20">
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                {/* Header con badge */}
+          <Card key={index} className="card-natural hover:glow-effect transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                {/* Header compacto */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-3 rounded-xl ${item.bgColor} ring-1 ring-border/20`}>
-                      <IconComponent className={`w-6 h-6 ${item.color}`} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground text-sm">{item.label}</h3>
-                      <Badge variant="secondary" className="text-xs mt-1">
-                        {item.badge}
-                      </Badge>
-                    </div>
+                  <div className={`p-2 rounded-lg ${item.bgColor}`}>
+                    <IconComponent className={`w-4 h-4 ${item.color}`} />
                   </div>
+                  <Badge variant="secondary" className="text-xs">
+                    {item.badge}
+                  </Badge>
                 </div>
 
-                {/* Métricas principales */}
-                <div className="space-y-2">
-                  <div className="flex items-end gap-2">
-                    <span className="text-3xl font-bold text-foreground">
+                {/* Métrica principal */}
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-medium">{item.label}</p>
+                  <div className="flex items-end gap-1">
+                    <span className="text-xl font-bold text-foreground">
                       {item.value.toLocaleString()}
                     </span>
-                    <span className="text-sm text-muted-foreground pb-1">
+                    <span className="text-xs text-muted-foreground pb-0.5">
                       {item.metric}
                     </span>
                   </div>
-                  
-                  {/* Trend indicator */}
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-3.5 h-3.5 text-success" />
-                    <span className="text-sm font-medium text-success">
-                      {item.trend}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      vs mes anterior
-                    </span>
-                  </div>
                 </div>
 
-                {/* Progress bar */}
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Rendimiento</span>
-                    <span>{item.metric.includes('%') ? item.value : '100'}%</span>
+                {/* Trend compacto */}
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3 text-success" />
+                    <span className="font-medium text-success">{item.trend}</span>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full ${item.color.replace('text-', 'bg-')} rounded-full transition-all duration-500`}
-                      style={{ 
-                        width: `${item.metric.includes('%') ? item.value : Math.min(100, (item.value / Math.max(item.value, 100)) * 100)}%` 
-                      }}
-                    />
-                  </div>
+                  <span className="text-muted-foreground">
+                    {item.metric.includes('%') ? item.value : '100'}%
+                  </span>
+                </div>
+
+                {/* Progress bar compacto */}
+                <div className="h-1 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full ${item.color.replace('text-', 'bg-')} rounded-full transition-all duration-500`}
+                    style={{ 
+                      width: `${item.metric.includes('%') ? item.value : Math.min(100, (item.value / Math.max(item.value, 100)) * 100)}%` 
+                    }}
+                  />
                 </div>
               </div>
             </CardContent>
