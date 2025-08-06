@@ -103,23 +103,6 @@ const ChequeScanner = ({ onImageCaptured }: ChequeScannerProps) => {
             Sistema OCR especializado para cheques de bancos ecuatorianos
           </p>
           
-          <div className="bg-blue-50 p-4 rounded-lg mb-4">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <QrCode className="w-5 h-5 text-blue-600" />
-              <span className="font-medium text-blue-800">OCR Ecuatoriano Especializado</span>
-            </div>
-            <p className="text-sm text-blue-700 mb-2">
-              Sistema adaptado específicamente para Ecuador:
-            </p>
-            <ul className="text-sm text-blue-600 space-y-1 text-left">
-              <li>• ✅ Validación automática de RUC y Cédula</li>
-              <li>• 🏦 Integración con bancos ecuatorianos</li>
-              <li>• 💰 Verificación de fondos en tiempo real</li>
-              <li>• 📋 Generación de comprobantes SRI</li>
-              <li>• 🌎 Reconocimiento de provincias del Ecuador</li>
-              <li>• 📊 Cálculo automático de IVA (12%)</li>
-            </ul>
-          </div>
           
           <input
             ref={fileInputRef}
