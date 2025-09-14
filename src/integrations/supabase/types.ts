@@ -406,6 +406,87 @@ export type Database = {
         }
         Relationships: []
       }
+      cheques: {
+        Row: {
+          banco: string
+          beneficiario: string | null
+          codigo_banco: string | null
+          confianza_ocr: number | null
+          created_at: string
+          cuenta_bancaria: string | null
+          datos_ocr: Json | null
+          estado: string | null
+          fecha_emision: string | null
+          fecha_vencimiento: string | null
+          id: string
+          imagen_encrypted: string | null
+          imagen_url: string | null
+          intentos_procesamiento: number | null
+          monto: number
+          notas: string | null
+          numero_cheque: string
+          procesado_en_backend: boolean | null
+          ruc_cedula_beneficiario: string | null
+          sincronizado: boolean | null
+          tipo_cheque: string | null
+          updated_at: string
+          user_id: string
+          validaciones: Json | null
+        }
+        Insert: {
+          banco: string
+          beneficiario?: string | null
+          codigo_banco?: string | null
+          confianza_ocr?: number | null
+          created_at?: string
+          cuenta_bancaria?: string | null
+          datos_ocr?: Json | null
+          estado?: string | null
+          fecha_emision?: string | null
+          fecha_vencimiento?: string | null
+          id?: string
+          imagen_encrypted?: string | null
+          imagen_url?: string | null
+          intentos_procesamiento?: number | null
+          monto: number
+          notas?: string | null
+          numero_cheque: string
+          procesado_en_backend?: boolean | null
+          ruc_cedula_beneficiario?: string | null
+          sincronizado?: boolean | null
+          tipo_cheque?: string | null
+          updated_at?: string
+          user_id: string
+          validaciones?: Json | null
+        }
+        Update: {
+          banco?: string
+          beneficiario?: string | null
+          codigo_banco?: string | null
+          confianza_ocr?: number | null
+          created_at?: string
+          cuenta_bancaria?: string | null
+          datos_ocr?: Json | null
+          estado?: string | null
+          fecha_emision?: string | null
+          fecha_vencimiento?: string | null
+          id?: string
+          imagen_encrypted?: string | null
+          imagen_url?: string | null
+          intentos_procesamiento?: number | null
+          monto?: number
+          notas?: string | null
+          numero_cheque?: string
+          procesado_en_backend?: boolean | null
+          ruc_cedula_beneficiario?: string | null
+          sincronizado?: boolean | null
+          tipo_cheque?: string | null
+          updated_at?: string
+          user_id?: string
+          validaciones?: Json | null
+        }
+        Relationships: []
+      }
       clientes: {
         Row: {
           apellido: string | null
@@ -1627,6 +1708,45 @@ export type Database = {
           },
         ]
       }
+      ocr_queue: {
+        Row: {
+          cheque_id: string | null
+          created_at: string
+          error_message: string | null
+          estado: string | null
+          id: string
+          imagen_data: string
+          intentos: number | null
+          processed_at: string | null
+          resultado: Json | null
+          user_id: string
+        }
+        Insert: {
+          cheque_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          estado?: string | null
+          id?: string
+          imagen_data: string
+          intentos?: number | null
+          processed_at?: string | null
+          resultado?: Json | null
+          user_id: string
+        }
+        Update: {
+          cheque_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          estado?: string | null
+          id?: string
+          imagen_data?: string
+          intentos?: number | null
+          processed_at?: string | null
+          resultado?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       orden_compra_detalles: {
         Row: {
           cantidad: number
@@ -2708,6 +2828,36 @@ export type Database = {
         }
         Relationships: []
       }
+      sync_queue: {
+        Row: {
+          created_at: string
+          data_payload: Json
+          data_type: string
+          id: string
+          sync_status: string | null
+          synced_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_payload: Json
+          data_type: string
+          id?: string
+          sync_status?: string | null
+          synced_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_payload?: Json
+          data_type?: string
+          id?: string
+          sync_status?: string | null
+          synced_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       transacciones: {
         Row: {
           categoria: string | null
@@ -3269,6 +3419,10 @@ export type Database = {
           stock_sistema: number
           valor_diferencia: number
         }[]
+      }
+      get_cheque_stats: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       get_next_invoice_number: {
         Args: {
